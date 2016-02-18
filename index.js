@@ -4,15 +4,18 @@
  * Serverless Optimizer Plugin
  */
 
+function getHandlerDirectoryPath(handler) {
+  return handler.substr(0, handler.lastIndexOf('/') + 1);
+}
+
 module.exports = function(ServerlessPlugin) {
 
   const path    = require('path'),
     _           = require('lodash'),
     fs          = require('fs'),
-    browserify  = require('browserify'),
-    UglifyJS    = require('uglify-js'),
+    webpack  = require('webpack'),
     wrench      = require('wrench'),
-    BbPromise   = require('bluebird');
+    Promise   = require('bluebird');
 
   /**
    * ServerlessOptimizer
@@ -47,7 +50,7 @@ module.exports = function(ServerlessPlugin) {
         event: 'post'
       });
 
-      return BbPromise.resolve();
+      return Promise.resolve();
     }
 
     /**
@@ -68,12 +71,12 @@ module.exports = function(ServerlessPlugin) {
 
       // Skip if no optimization is set on component OR function
       if ((!component.custom || !component.custom.optimize) && (!func.custom || !func.custom.optimize)) {
-        return BbPromise.resolve(evt);
+        return Promise.resolve(evt);
       }
 
       // If optimize is set in component, but false in function, skip
       if (component.custom && component.custom.optimize && func.custom && func.custom.optimize === false) {
-        return BbPromise.resolve(evt);
+        return Promise.resolve(evt);
       }
 
       // Optimize: Nodejs
@@ -86,7 +89,7 @@ module.exports = function(ServerlessPlugin) {
       }
 
       // Otherwise, skip plugin
-      return BbPromise.resolve(evt);
+      return Promise.resolve(evt);
     }
   }
 
@@ -108,15 +111,11 @@ module.exports = function(ServerlessPlugin) {
 
       let _this = this;
 
+      const projectPath = this.S.config.projectPath;
+
       _this.config = {
         handlerExt:   'js',
-        includePaths: [],
-        requires:     [],
-        plugins:      [],
-        transforms:   [],
-        exclude:      [],
-        ignore:       [],
-        extensions:   []
+        webpackConfigPath: ''
       };
       _this.config = _.merge(
         _this.config,
@@ -124,104 +123,56 @@ module.exports = function(ServerlessPlugin) {
         _this.function.custom.optimize ? _this.function.custom.optimize === true ? {} : _this.function.custom.optimize : {}
       );
 
-      // Browserify
-      return _this.browserify()
-        .then(function() {
-          return _this.evt;
-        });
+
+      try {
+        this.config.webpackConfig = require(path.join(projectPath, this.config.webpackConfigPath));
+        return _this.bundle()
+          .then(function() {
+            return _this.evt;
+          });
+      } catch (e) {
+        return Promise.reject(e);
+      }
     }
 
-    /**
-     * Browserify
-     * - Options: transform, exclude, minify, ignore
-     */
+    bundle() {
+      let _this = this;
 
-    browserify() {
+      const webpackConfig = _this.config.webpackConfig;
+      const bundledFilename = 'bundled.js';
+      const handlerDirectory = getHandlerDirectoryPath(_this.function.handler);
 
-      let _this       = this;
-      let uglyOptions = {
-        mangle:   true, // @see http://lisperator.net/uglifyjs/compress
-        compress: {}
+      // override entry and output
+      webpackConfig.entry = './' + _this.function.handler.split('.')[0] + '.' + _this.config.handlerExt;
+      webpackConfig.output = {
+        libraryTarget: 'commonjs',
+        path: _this.evt.data.pathDist,
+        filename: bundledFilename
       };
 
-      let b = browserify({
-        basedir:          fs.realpathSync(_this.evt.data.pathDist),
-        entries:          [_this.function.handler.split('.')[0] + '.' + _this.config.handlerExt],
-        standalone:       'lambda',
-        extensions:       _this.config.extensions,
-        browserField:     false,  // Setup for node app (copy logic of --node in bin/args.js)
-        builtins:         false,
-        commondir:        false,
-        ignoreMissing:    true,  // Do not fail on missing optional dependencies
-        detectGlobals:    true,  // Default for bare in cli is true, but we don't care if its slower
-        insertGlobalVars: {      // Handle process https://github.com/substack/node-browserify/issues/1277
-          //__filename: insertGlobals.lets.__filename,
-          //__dirname: insertGlobals.lets.__dirname,
-          process: function () {
-          }
-        }
-      });
-
-      // browserify.require
-      _this.config.requires.map(req => {
-        if (typeof(req) === typeof('')) req = {name: req};
-        b.require(req.name, req.opts);
-      });
-
-      // browserify.plugin
-      _this.config.plugins.map(plug => {
-        if (typeof(plug) === typeof('')) plug = {name: plug};
-        b.plugin(require(plug.name), plug.opts);
-      });
-
-      // browserify.transform
-      _this.config.transforms.map(transform => {
-        if (typeof(transform) === typeof('')) transform = {name: transform};
-        b.transform(require(transform.name), transform.opts);
-      });
-
-      // browserify.exclude
-      _this.config.exclude.forEach(file => b.exclude(file));
-
-      // browserify.ignore
-      _this.config.ignore.forEach(file => b.ignore(file));
+      const pathBundled = _this.pathBundled = path.join(_this.evt.data.pathDist, bundledFilename);   // Save for auditing
 
       // Perform Bundle
-      _this.pathBundled   = path.join(_this.evt.data.pathDist, 'bundled.js');   // Save for auditing
-      _this.pathMinified  = path.join(_this.evt.data.pathDist, 'minified.js');  // Save for auditing
-
-      return new BbPromise(function (resolve, reject) {
-
-        b.bundle(function (err, bundledBuf) {
-
+      return new Promise(function (resolve, reject) {
+        webpack(webpackConfig).run(function(err, stats) {
           if (err) {
-            console.error('Error running browserify bundle');
-            reject(err);
-          } else {
-
-            fs.writeFileSync(_this.pathBundled, bundledBuf);
-
-            // Minify browserified data
-
-            if (_this.config.minify !== false) {
-
-              let result = UglifyJS.minify(_this.pathBundled, uglyOptions);
-
-              if (!result || !result.code) return reject(new SError('Problem uglifying code'));
-
-              fs.writeFileSync(_this.pathMinified, result.code);
-
-              resolve(_this.pathMinified);
-            } else {
-              resolve(_this.pathBundled);
-            }
+            return reject(err);
           }
+          console.log(stats.toString({
+            colors: true,
+            hash: false,
+            version: false,
+            chunks: false,
+            children: false
+          }));
+
+          resolve(_this.pathBundled);
         });
       })
-        .then(pathOptimized => {
+        .then(() => {
 
           // Save final optimized path
-          _this.pathOptimized = pathOptimized;
+          _this.pathOptimized = pathBundled;
 
           let envData       = fs.readFileSync(path.join(_this.evt.data.pathDist, '.env')),
             handlerFileName = _this.function.handler.split('.')[0];
@@ -237,6 +188,13 @@ module.exports = function(ServerlessPlugin) {
               path: path.join(_this.evt.data.pathDist, '.env')
             }
           ];
+
+          if (webpackConfig.devtool === 'source-map') {
+            _this.evt.data.pathsPackaged.push({
+              name: handlerDirectory + bundledFilename + '.map',
+              path: _this.pathOptimized + '.map'
+            });
+          }
 
           // Reassign pathsPackages property
           _this.evt.data.pathsPackaged = _this.evt.data.pathsPackaged.concat(_this._generateIncludePaths());
