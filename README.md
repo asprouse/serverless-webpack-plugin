@@ -2,7 +2,7 @@ Serverless Webpack Plugin
 =============================
 **Warning: This plugin is very experimental use at your own risk.**
 
-Inspired by [serverless-optimizer-plugin](https://github.com/serverless/serverless-optimizer-plugin) this plugin uses webpack to optimize your Serverless Node.js Functions on deployment.
+Forked from [serverless-optimizer-plugin](https://github.com/serverless/serverless-optimizer-plugin) this plugin uses webpack to optimize your Serverless Node.js Functions on deployment.
 
 Reducing the file size of your AWS Lambda Functions allows AWS to provision them more quickly, speeding up the response time of your Lambdas.  Smaller Lambda sizes also helps you develop faster because you can upload them faster.  This Severless Plugin is absolutely recommended for every project including Lambdas with Node.js.
 
