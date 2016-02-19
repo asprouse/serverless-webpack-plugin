@@ -21,7 +21,7 @@ module.exports = function(ServerlessPlugin) {
    * ServerlessOptimizer
    */
 
-  class ServerlessOptimizer extends ServerlessPlugin {
+  class ServerlessWebpack extends ServerlessPlugin {
 
     /**
      * Constructor
@@ -36,7 +36,7 @@ module.exports = function(ServerlessPlugin) {
      */
 
     static getName() {
-      return 'com.serverless.' + ServerlessOptimizer.name;
+      return 'com.serverless.' + ServerlessWebpack.name;
     }
 
     /**
@@ -70,12 +70,12 @@ module.exports = function(ServerlessPlugin) {
         optimizer;
 
       // Skip if no optimization is set on component OR function
-      if ((!component.custom || !component.custom.optimize) && (!func.custom || !func.custom.optimize)) {
+      if ((!component.custom || !component.custom.webpack) && (!func.custom || !func.custom.webpack)) {
         return Promise.resolve(evt);
       }
 
       // If optimize is set in component, but false in function, skip
-      if (component.custom && component.custom.optimize && func.custom && func.custom.optimize === false) {
+      if (component.custom && component.custom.webpack && func.custom && func.custom.webpack === false) {
         return Promise.resolve(evt);
       }
 
@@ -119,13 +119,13 @@ module.exports = function(ServerlessPlugin) {
       };
       _this.config = _.merge(
         _this.config,
-        _this.component.custom.optimize ? _this.component.custom.optimize === true ? {} : _this.component.custom.optimize : {},
-        _this.function.custom.optimize ? _this.function.custom.optimize === true ? {} : _this.function.custom.optimize : {}
+        _this.component.custom.webpack ? _this.component.custom.webpack === true ? {} : _this.component.custom.webpack : {},
+        _this.function.custom.webpack ? _this.function.custom.webpack === true ? {} : _this.function.custom.webpack : {}
       );
 
 
       try {
-        this.config.webpackConfig = require(path.join(projectPath, this.config.webpackConfigPath));
+        this.config.webpackConfig = require(path.join(projectPath, this.config.configPath));
         return _this.bundle()
           .then(function() {
             return _this.evt;
@@ -262,5 +262,5 @@ module.exports = function(ServerlessPlugin) {
     }
   }
 
-  return ServerlessOptimizer;
+  return ServerlessWebpack;
 };

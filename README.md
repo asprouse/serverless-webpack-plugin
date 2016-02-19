@@ -1,8 +1,8 @@
-Serverless Optimizer Plugin (Webpack fork)
+Serverless Webpack Plugin
 =============================
-**Warning: This fork is very experimental use at your own risk**
+**Warning: This plugin is very experimental use at your own risk.**
 
-Webpacks your Serverless Node.js Functions on deployment, and more!
+Inspired by [serverless-optimizer-plugin](https://github.com/serverless/serverless-optimizer-plugin) this plugin uses webpack to optimize your Serverless Node.js Functions on deployment.
 
 Reducing the file size of your AWS Lambda Functions allows AWS to provision them more quickly, speeding up the response time of your Lambdas.  Smaller Lambda sizes also helps you develop faster because you can upload them faster.  This Severless Plugin is absolutely recommended for every project including Lambdas with Node.js.
 
@@ -12,34 +12,26 @@ Reducing the file size of your AWS Lambda Functions allows AWS to provision them
 
 * Install via npm in the root of your Serverless Project:
 ```
-npm install asprouse/serverless-optimizer-plugin --save
-```
-
-* In the `custom` property of either your `s-component.json` or `s-function.json` add an optimize property.
-
-```
-"custom": {
-	"optimize": true
-}
+npm install serverless-webpack-plugin --save
 ```
 
 * Add the plugin to the `plugins` array in your Serverless Project's `s-project.json`, like this:
 
 ```
 plugins: [
-    "serverless-optimizer-plugin"
+    "serverless-webpack-plugin"
 ]
 ```
 
-* Add the webpackConfigPath transform to `s-component.json`:
+* In the `custom` property of either your `s-component.json` or `s-function.json` add an webpack property.
 
 ```javascript
 {
     "name": "nodejscomponent",
     "runtime": "nodejs",
     "custom": {
-        "optimize": {
-            "webpackConfigPath": 'path/relative/to/project-path',
+        "webpack": {
+            "configPath": 'path/relative/to/project-path',
         }
     }
 }
@@ -47,7 +39,7 @@ plugins: [
 ```
 
 
-Adding the `custom.optimize.webpackConfigPath` property in `s-component.json` applies the optimization setting to ALL functions in that component.  Adding the `custom.optimize.webpackConfigPath` property to `s-function.json` applies the optimization setting to ONLY that specific function.  You can use `custom.optimize.webpackConfigPath` in both places.  The `custom.optimize.webpackConfigPath` setting in `s-function.json` will override the setting in `s-component.json`.
+Adding the `custom.webpack.configPath` property in `s-component.json` applies the optimization setting to ALL functions in that component.  Adding the `custom.webpack.configPath` property to `s-function.json` applies the optimization setting to ONLY that specific function.  You can use `custom.webpack.configPath` in both places.  The `custom.webpack.configPath` setting in `s-function.json` will override the setting in `s-component.json`.
 
 
 
@@ -103,8 +95,8 @@ In this case assume your component is named `foo` and your config `webpack.confi
     "name": "nodejscomponent",
     "runtime": "nodejs",
     "custom": {
-        "optimize": {
-            "webpackConfigPath": 'foo/webpack.config.js',
+        "webpack": {
+            "configPath": 'foo/webpack.config.js',
         }
     }
 }

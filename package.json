@@ -1,19 +1,19 @@
 {
-  "name": "serverless-optimizer-plugin",
-  "version": "1.1.0",
+  "name": "serverless-webpack-plugin",
+  "version": "0.1.0",
   "engines": {
     "node": ">=4.0"
   },
-  "description": "Serverless Optimizer Plugin - Significantly reduces Lambda file size and improves performance",
-  "author": "serverless.com",
+  "description": "Serverless Webpack Plugin - Significantly reduces Lambda file size and improves performance",
+  "author": "asprouse",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/serverless/serverless-optimizer-plugin"
+    "url": "https://github.com/asprouse/serverless-webpack-plugin"
   },
   "keywords": [
-    "serverless optimizer plugin",
-    "serverless optimizer",
+    "serverless webpack plugin",
+    "serverless webpack",
     "serverless framework plugin",
     "serverless applications",
     "serverless plugins",
