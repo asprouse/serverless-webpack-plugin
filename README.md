@@ -104,4 +104,20 @@ In this case assume your component is named `foo` and your config `webpack.confi
 
 
 ### Source Maps
-Yes using `devtool: 'source-map'` works, include `require('source-map-support').install();` you'll have pretty stacktraces. 
+Yes using `devtool: 'source-map'` works, include `require('source-map-support').install();` you'll have pretty stacktraces.
+ 
+### Improving deploy performance
+  
+If you have a large node_modules or lib directories you can prevent these from being copied using `exlcudePatterns` in your s-function.json:
+
+```javascript
+{
+    ...
+    "custom": {
+        "excludePatterns": [".*"],
+        ...
+    }
+}
+```
+
+Since the plugin builds directly from the source files, copying is unnecessary. 
