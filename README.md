@@ -31,7 +31,7 @@ plugins: [
     "runtime": "nodejs",
     "custom": {
         "webpack": {
-            "configPath": 'path/relative/to/project-path',
+            "configPath": "path/relative/to/project-path"
         }
     }
 }
@@ -96,7 +96,7 @@ In this case assume your component is named `foo` and your config `webpack.confi
     "runtime": "nodejs",
     "custom": {
         "webpack": {
-            "configPath": 'foo/webpack.config.js',
+            "configPath": "foo/webpack.config.js"
         }
     }
 }
