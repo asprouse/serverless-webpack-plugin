@@ -44,7 +44,7 @@ Adding the `custom.webpack.configPath` property in `s-component.json` applies th
 
 
 ## Webpack config
-This fork allows you completely customize how your code is optimized by specifying your own webpack config. Heres a sample `webpack.config.js`:
+This fork allows you to completely customize how your code is optimized by specifying your own webpack config. Heres a sample `webpack.config.js`:
 
 ```javascript
 var webpack = require('webpack');
@@ -108,7 +108,7 @@ Yes using `devtool: 'source-map'` works, include `require('source-map-support').
  
 ### Improving deploy performance
   
-If you have a large node_modules or lib directories you can prevent these from being copied using `exlcudePatterns` in your s-function.json:
+If you have a large node_modules or lib directories you can prevent these from being copied using `excludePatterns` in your s-function.json:
 
 ```javascript
 {
