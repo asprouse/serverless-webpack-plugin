@@ -1,0 +1,14 @@
+{
+  "extends": "airbnb/base",
+  "env": {
+    "mocha": true,
+    "node": true
+  },
+  "globals": {},
+  "rules": {
+    "comma-dangle": 0,
+    "padded-blocks": 0,
+    "indent": 0,
+    "id-length": 0
+  }
+}
