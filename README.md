@@ -102,6 +102,8 @@ In this case assume your component is named `foo` and your config `webpack.confi
 }
 ```
 
+### Externals
+As of 0.2.0 any externals specified in your webpack config will now be properly packaged into the deployment. This is useful when working with modules that have binary dependencies or if you simply want to improve build performance. Check out [webpack-node-externals](https://github.com/liady/webpack-node-externals) for an easy way to externalize all node modules.
 
 ### Source Maps
 Yes using `devtool: 'source-map'` works, include `require('source-map-support').install();` you'll have pretty stacktraces.
