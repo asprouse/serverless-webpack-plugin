@@ -30,7 +30,7 @@
   "main": "index.js",
   "bin": {},
   "scripts": {
-    "test": "mocha tests/all"
+    "test": "NODE_PATH=. mocha \"test/**/*.test.js\""
   },
   "devDependencies": {
     "chai": "^3.4.1",

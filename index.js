@@ -44,7 +44,7 @@ module.exports = function getPlugin(ServerlessPlugin) {
 
         if (config.webpackConfig) {
           const pathDist = evt.data.pathDist;
-          return bundle(config, pathDist, func)
+          return bundle(config, pathDist, component, func)
             .then(pathsPackaged => {
               evt.data.pathsPackaged = pathsPackaged; // eslint-disable-line
               return evt;
