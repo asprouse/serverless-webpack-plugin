@@ -10,9 +10,9 @@ Reducing the file size of your AWS Lambda Functions allows AWS to provision them
 
 ### Setup
 
-* Install via npm in the root of your Serverless Project:
+* Install the plugin and webpack in the root of your Serverless Project:
 ```
-npm install serverless-webpack-plugin --save
+npm install serverless-webpack-plugin webpack --save-dev
 ```
 
 * Add the plugin to the `plugins` array in your Serverless Project's `s-project.json`, like this:
@@ -87,7 +87,7 @@ module.exports = {
   }
 };
 ```
-It's probably best to put this file in the component directory, this is also where you should install `webpack`, `babel-loader`, `babel-preset-es2015`, etc. 
+It's probably best to put this file in the component directory, this is also where you should install `babel-loader`, `babel-preset-es2015`, etc. 
 In this case assume your component is named `foo` and your config `webpack.config.js` your `s-component.json` will look like: 
 
 ```javascript
