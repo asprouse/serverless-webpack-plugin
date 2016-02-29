@@ -64,14 +64,6 @@ module.exports = {
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        unused: true,
-        dead_code: true,
-        warnings: false,
-        drop_debugger: true
-      }
-    })
   ],
   module: {
     loaders: [
@@ -87,8 +79,8 @@ module.exports = {
   }
 };
 ```
-It's probably best to put this file in the component directory, this is also where you should install `webpack`, `babel-loader`, `babel-preset-es2015`, etc. 
-In this case assume your component is named `foo` and your config `webpack.config.js` your `s-component.json` will look like: 
+It's probably best to put this file in the component directory, this is also where you should install `webpack`, `babel-loader`, `babel-preset-es2015`, etc.
+In this case assume your component is named `foo` and your config `webpack.config.js` your `s-component.json` will look like:
 
 ```javascript
 {
@@ -107,9 +99,9 @@ As of 0.2.0 any externals specified in your webpack config will now be properly 
 
 ### Source Maps
 Yes using `devtool: 'source-map'` works, include `require('source-map-support').install();` you'll have pretty stacktraces.
- 
+
 ### Improving deploy performance
-  
+
 If you have a large node_modules or lib directories you can prevent these from being copied using `excludePatterns` in your s-function.json:
 
 ```javascript
@@ -122,4 +114,4 @@ If you have a large node_modules or lib directories you can prevent these from b
 }
 ```
 
-Since the plugin builds directly from the source files, copying is unnecessary. 
+Since the plugin builds directly from the source files, copying is unnecessary.
