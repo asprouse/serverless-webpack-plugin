@@ -1,6 +1,6 @@
 {
   "name": "serverless-webpack-plugin",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "engines": {
     "node": ">=4.0"
   },
@@ -28,22 +28,15 @@
     "serverless.com"
   ],
   "main": "index.js",
-  "bin": {},
-  "scripts": {
-    "test": "NODE_PATH=. mocha \"test/**/*.test.js\""
-  },
   "peerDependencies": {
     "webpack": "^1.12.14"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
-    "mocha": "^2.3.4",
-    "eslint": "^1.10.3",
-    "eslint-config-airbnb": "^5.0.0"
+    "babel-eslint": "^6.0.0",
+    "eslint": "^2.5.3"
   },
   "dependencies": {
     "bluebird": "^3.1.1",
-    "lodash": "^4.0.0",
     "wrench": "^1.5.8"
   }
 }
