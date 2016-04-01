@@ -61,7 +61,7 @@ plugins: [
 }
 ```
 
-## Webpack config
+### Webpack config
 This fork allows you to completely customize how your code is optimized by specifying your own webpack config. Heres a sample `webpack.config.js`:
 
 ```javascript
@@ -105,6 +105,9 @@ module.exports = {
   }
 };
 ```
+
+### Extended config
+Function folders can contain their own `webpack.config.js` to extend the global config.
 
 ### Externals
 Externals specified in your webpack config will be properly packaged into the deployment.
