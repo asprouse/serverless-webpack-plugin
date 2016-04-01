@@ -1,11 +1,19 @@
 {
-  "extends": "airbnb/base",
+  "ecmaFeatures": {
+    "modules": true
+  },
   "env": {
     "node": true
   },
-  "globals": {},
+  "parser": "babel-eslint",
   "rules": {
-    "comma-dangle": 0,
-    "padded-blocks": 0
+    "strict": 0
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true
+    }
   }
 }

@@ -1,15 +1,14 @@
 Serverless Webpack Plugin
 =============================
-**Warning: This plugin is very experimental use at your own risk.**
 
-Forked from [serverless-optimizer-plugin](https://github.com/serverless/serverless-optimizer-plugin) this plugin uses 
+Forked from [serverless-optimizer-plugin](https://github.com/serverless/serverless-optimizer-plugin) this plugin uses
 webpack to optimize your Serverless Node.js Functions on deployment.
 
-Reducing the file size of your AWS Lambda Functions allows AWS to provision them more quickly, speeding up the response 
+Reducing the file size of your AWS Lambda Functions allows AWS to provision them more quickly, speeding up the response
 time of your Lambdas.  Smaller Lambda sizes also helps you develop faster because you can upload them faster.  
 This Severless Plugin is absolutely recommended for every project including Lambdas with Node.js.
 
-**Note:** Requires Serverless *v0.4.0*. Users are reporting it is NOT compatible with *v0.5.0* but support is forthcoming.
+**Note:** Requires Serverless *v0.5.0*.
 
 ### Setup
 
@@ -26,29 +25,43 @@ plugins: [
 ]
 ```
 
-* In the `custom` property of either your `s-component.json` or `s-function.json` add an webpack property.
+* In the `custom` property of your `s-project.json`  add a webpack property.
 
 ```javascript
 {
-    "name": "nodejscomponent",
-    "runtime": "nodejs",
-    "custom": {
-        "webpack": {
-            "configPath": "path/relative/to/project-path"
-        }
+  "custom": {
+    "webpack": {
+      "config": "path/relative/to/project-path"
     }
+  }
 }
 
 ```
 
+** You can optimize all your Node.js functions by configuring your `s-project.json`:
 
-Adding the `custom.webpack.configPath` property in `s-component.json` applies the optimization setting to ALL functions 
-in that component.  Adding the `custom.webpack.configPath` property to `s-function.json` applies the optimization 
-setting to ONLY that specific function.  You can use `custom.webpack.configPath` in both places.  
-The `custom.webpack.configPath` setting in `s-function.json` will override the setting in `s-component.json`.
+```javascript
+{
+  "custom": {
+    "webpack": {
+      "config": "path/relative/to/project-path",
+      "global": true
+    }
+  }
+}
+```
 
+** Or only optimize certain functions by configuring their `s-function.json`:
 
-## Webpack config
+```javascript
+{
+  "custom": {
+    "webpack": true
+  }
+}
+```
+
+### Webpack config
 This fork allows you to completely customize how your code is optimized by specifying your own webpack config. Heres a sample `webpack.config.js`:
 
 ```javascript
@@ -85,52 +98,22 @@ module.exports = {
         loader: 'babel',
         exclude: /node_modules/,
         query: {
-          presets: ['es2015', 'stage-0']
+          presets: [ 'es2015', 'stage-0' ]
         }
       }
     ]
   }
 };
 ```
-**Note:** Some node modules don't play nicely with `webpack.optimize.UglifyJsPlugin` in this case, you can omit it from 
-your config, or add the offending modules to `externals`. For more on externals see below.  
-  
-Put this file in the component directory, this is also where you should install `babel-loader`, `babel-preset-es2015`, etc. 
-In this case assume your component is named `foo` and your config `webpack.config.js` your `s-component.json` will look like: 
 
-```javascript
-{
-    "name": "nodejscomponent",
-    "runtime": "nodejs",
-    "custom": {
-        "webpack": {
-            "configPath": "foo/webpack.config.js"
-        }
-    }
-}
-```
+### Extended config
+Function folders can contain their own `webpack.config.js` to extend the global config.
 
 ### Externals
-Externals specified in your webpack config will be properly packaged into the deployment. 
-This is useful when working with modules that have binary dependencies, are incompatible with `webpack.optimize.UglifyJsPlugin` 
-or if you simply want to improve build performance. Check out [webpack-node-externals](https://github.com/liady/webpack-node-externals) 
+Externals specified in your webpack config will be properly packaged into the deployment.
+This is useful when working with modules that have binary dependencies, are incompatible with `webpack.optimize.UglifyJsPlugin`
+or if you simply want to improve build performance. Check out [webpack-node-externals](https://github.com/liady/webpack-node-externals)
 for an easy way to externalize all node modules.
 
 ### Source Maps
 Yes using `devtool: 'source-map'` works, include `require('source-map-support').install();` you'll have pretty stacktraces.
- 
-### Improving deploy performance
-  
-If you have a large node_modules or lib directories you can prevent these from being copied using `excludePatterns` in your s-function.json:
-
-```javascript
-{
-    ...
-    "custom": {
-        "excludePatterns": [".*"],
-        ...
-    }
-}
-```
-
-Since the plugin builds directly from the source files, copying is unnecessary. 
