@@ -59,7 +59,7 @@ module.exports = function getPlugin(S) {
       const project = S.getProject();
       const func = project.getFunction(evt.options.name);
 
-      if (func.runtime === 'nodejs') {
+      if (func.runtime === 'nodejs' || 'nodejs4.3') {
         const projectPath = S.config.projectPath;
         const config = getConfig(
           projectPath,
