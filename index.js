@@ -38,7 +38,7 @@ module.exports = function getPlugin(ServerlessPlugin) {
       const func = this.S.state.getFunctions({ paths: [evt.options.path] })[0];
       const component = func.getComponent();
 
-      if (component.runtime === 'nodejs') {
+      if (component.runtime === 'nodejs' || 'nodejs4.3') {
         const projectPath = this.S.config.projectPath;
         const config = getConfig(projectPath, component, func);
 
