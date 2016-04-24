@@ -72,7 +72,7 @@ module.exports = function getPlugin(S) {
           const optimizedPath = path.join(pathDist, 'optimized');
           const optimizedModulesPath = path.join(optimizedPath, 'node_modules');
 
-          const webpackConfig = config.webpackConfig;
+          const webpackConfig = Object.assign({}, config.webpackConfig);
           const handlerName = func.getHandler().split('.')[0];
           const handlerFileName = `${handlerName}.${config.handlerExt}`;
 
