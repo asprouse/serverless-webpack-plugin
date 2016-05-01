@@ -78,7 +78,11 @@ module.exports = function getPlugin(S) {
 
           // override entry and output
           webpackConfig.context = path.dirname(func.getFilePath());
-          webpackConfig.entry = `./${handlerFileName}`;
+          if (Array.isArray(webpackConfig.entry)) {
+            webpackConfig.entry.push(`./${handlerFileName}`);
+          } else {
+            webpackConfig.entry = `./${handlerFileName}`;
+          }
           webpackConfig.output = {
             libraryTarget: 'commonjs',
             path: optimizedPath,
