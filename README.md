@@ -96,6 +96,13 @@ for an easy way to externalize all node modules.
 
 ### Source Maps
 Yes using `devtool: 'source-map'` works, include `require('source-map-support').install();` you'll have pretty stacktraces.
+
+### Loading additional modules before the lambda function module
+If you need to load modules before your lambda function module is loaded,
+you can specify those modules with entry option in your webpack config.
+For example if you need to load the babel-polyfill, you can do that
+by adding `entry: ['babel-polyfill']` to your webpack config.
+This will first load the babel-polyfill module and then your lambda function module.
  
 ### Improving deploy performance
   
