@@ -84,7 +84,6 @@ module.exports = function getPlugin(S) {
           } else {
             webpackConfig.entry = handlerEntryPath;
           }
-
           webpackConfig.output = {
             libraryTarget: 'commonjs',
             path: optimizedPath,
