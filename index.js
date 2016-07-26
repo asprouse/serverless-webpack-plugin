@@ -1,13 +1,16 @@
 'use strict';
+
+const fs = require('fs');
 const path = require('path');
-const webpack = require('webpack');
 const Promise = require('bluebird');
-const fs = Promise.promisifyAll(require('fs-extra'));
+const webpack = require('webpack');
+const Zip = require('node-zip');
 
-const getConfig = require('./lib/getConfig');
-const getExternalsFromStats = require('./lib/getExternalsFromStats');
-const copyModules = require('./lib/copyModules');
-
+const compact = require('lodash/fp/compact');
+const concat = require('lodash/fp/concat');
+const forEach = require('lodash/fp/forEach');
+const map = require('lodash/fp/map');
+const uniq = require('lodash/fp/uniq');
 
 function runWebpack(config) {
   return new Promise((resolve, reject) => {
@@ -20,99 +23,65 @@ function runWebpack(config) {
   });
 }
 
-module.exports = function getPlugin(S) {
-  const SCli = require(S.getServerlessPath('utils/cli'));
+function format(stats) {
+  return stats.toString({
+    colors: true,
+    hash: false,
+    version: false,
+    chunks: false,
+    children: false
+  });
+}
 
-  function logStats(stats) {
-    SCli.log(stats.toString({
-      colors: true,
-      hash: false,
-      version: false,
-      chunks: false,
-      children: false
-    }));
+const artifact = 'handler.js';
+
+module.exports = class ServerlessWebpack {
+  constructor(serverless) {
+    this.serverless = serverless;
+    this.hooks = {
+      'before:deploy:createDeploymentPackage': this.optimize.bind(this)
+    };
   }
 
-  class ServerlessWebpack extends S.classes.Plugin {
-
-    static getName() {
-      return `com.serverless.${ServerlessWebpack.name}`;
+  optimize() {
+    if (this.serverless.getVersion() !== '1.0.0-alpha.2') {
+      throw new this.serverless.classes.Error(
+        'WARNING: This version of serverless-webpack-plugin needs Serverless 1.0.0-alpha.2'
+      );
     }
+    const servicePath = this.serverless.config.servicePath;
+    const serverlessTmpDirPath = path.join(servicePath, '.serverless');
 
-    registerHooks() {
-      S.addHook(this.optimize.bind(this), {
-        action: 'codeDeployLambda',
-        event: 'pre'
+    const handlerNames = uniq(map(f => f.handler.split('.')[0], this.serverless.service.functions));
+    const entrypoints = map(h => `./${h}.js`, handlerNames);
+
+    const webpackConfig = require(path.resolve(servicePath, './webpack.config.js'));
+    webpackConfig.context = servicePath;
+    webpackConfig.entry = compact(concat(webpackConfig.entry, entrypoints));
+    webpackConfig.output = {
+      libraryTarget: 'commonjs',
+      path: serverlessTmpDirPath,
+      filename: artifact
+    };
+
+    return runWebpack(webpackConfig)
+    .then(stats => this.serverless.cli.log(format(stats)))
+    .then(() => {
+      const zip = new Zip();
+      forEach(f =>
+        zip.file(f, fs.readFileSync(path.resolve(serverlessTmpDirPath, f))
+      ), [artifact, `${artifact}.map`]);
+      const data = zip.generate({
+        type: 'nodebuffer',
+        compression: 'DEFLATE',
+        platform: process.platform,
       });
+      const zipFileName =
+        `${this.serverless.service.service}-${(new Date).getTime().toString()}.zip`;
+      const artifactFilePath = path.resolve(serverlessTmpDirPath, zipFileName);
 
-      return Promise.resolve();
-    }
-
-    optimize(evt) {
-      // Validate: Check Serverless version
-      if (parseInt(S._version.split('.')[1], 10) < 5) {
-        SCli.log('WARNING: This version of the Serverless Optimizer Plugin ' +
-          'will not work with a version of Serverless that is less than v0.5');
-      }
-
-      // Get function
-      const project = S.getProject();
-      const func = project.getFunction(evt.options.name);
-
-      if (func.runtime === 'nodejs' || func.runtime === 'nodejs4.3') {
-        const projectPath = S.config.projectPath;
-        const config = getConfig(
-          projectPath,
-          project.toObjectPopulated(evt.options),
-          func.toObjectPopulated(evt.options)
-        );
-
-        if (config.webpackConfig) {
-          const pathDist = evt.options.pathDist;
-          const optimizedPath = path.join(pathDist, 'optimized');
-          const optimizedModulesPath = path.join(optimizedPath, 'node_modules');
-
-          const webpackConfig = Object.assign({}, config.webpackConfig);
-          const handlerName = func.getHandler().split('.')[0];
-          const handlerFileName = `${handlerName}.${config.handlerExt}`;
-          const handlerEntryPath = `./${handlerFileName}`;
-
-          // override entry and output
-          webpackConfig.context = path.dirname(func.getFilePath());
-          if (Array.isArray(webpackConfig.entry)) {
-            webpackConfig.entry.push(handlerEntryPath);
-          } else {
-            webpackConfig.entry = handlerEntryPath;
-          }
-          webpackConfig.output = {
-            libraryTarget: 'commonjs',
-            path: optimizedPath,
-            filename: handlerFileName
-          };
-
-          // copy generated handler so we can build directly from the source directory
-          const generatedHandler = path.join(webpackConfig.context, handlerFileName);
-
-          return fs.copyAsync(path.join(pathDist, handlerFileName), generatedHandler)
-            .then(() => fs.mkdirsAsync(optimizedModulesPath))
-            .then(() => runWebpack(webpackConfig))
-            .then((stats) => {
-              logStats(stats);
-              const externals = getExternalsFromStats(stats);
-              return copyModules(projectPath, externals, optimizedModulesPath);
-            })
-            .then(() => {
-              evt.options.pathDist = optimizedPath; // eslint-disable-line
-              return evt;
-            })
-            // delete generated handler we copied above
-            .finally(() => fs.removeAsync(generatedHandler));
-        }
-      }
-
-      return Promise.resolve(evt);
-    }
+      this.serverless.utils.writeFileSync(artifactFilePath, data);
+      this.serverless.service.package.artifact = artifactFilePath;
+    });
   }
-
-  return ServerlessWebpack;
 };
