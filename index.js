@@ -44,9 +44,9 @@ module.exports = class ServerlessWebpack {
   }
 
   optimize() {
-    if (this.serverless.getVersion() !== '1.0.0-alpha.2') {
+    if (this.serverless.getVersion() !== '1.0.0-beta.1') {
       throw new this.serverless.classes.Error(
-        'WARNING: This version of serverless-webpack-plugin needs Serverless 1.0.0-alpha.2'
+        'WARNING: This version of serverless-webpack-plugin needs Serverless 1.0.0-beta.1'
       );
     }
     const servicePath = this.serverless.config.servicePath;
