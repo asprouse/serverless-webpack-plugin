@@ -1,19 +1,37 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var runWebpack = function () {
-  var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(config) {
-    return regeneratorRuntime.wrap(function _callee$(_context) {
+  var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(config) {
+    return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            return _context.abrupt('return', new Promise(function (resolve, reject) {
+            return _context.abrupt('return', new _promise2.default(function (resolve, reject) {
               (0, _webpack2.default)(config).run(function (err, stats) {
                 if (err) {
                   return reject(err);
                 }
-                resolve(stats);
+                return resolve(stats);
               });
             }));
 
@@ -50,10 +68,6 @@ var _fp = require('lodash/fp');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
-
 function format(stats) {
   return stats.toString({
     colors: true,
@@ -66,9 +80,13 @@ function format(stats) {
 
 var artifact = 'handler.js';
 
+var getConfig = function getConfig(servicePath) {
+  return require(_path2.default.resolve(servicePath, './webpack.config.js'));
+}; // eslint-disable-line global-require
+
 module.exports = function () {
   function ServerlessWebpack(serverless) {
-    _classCallCheck(this, ServerlessWebpack);
+    (0, _classCallCheck3.default)(this, ServerlessWebpack);
 
     this.serverless = serverless;
     this.hooks = {
@@ -76,13 +94,13 @@ module.exports = function () {
     };
   }
 
-  _createClass(ServerlessWebpack, [{
+  (0, _createClass3.default)(ServerlessWebpack, [{
     key: 'optimize',
     value: function optimize() {
       var _this = this;
 
       if (!this.serverless.getVersion().startsWith('1.0')) {
-        throw new this.serverless.classes.Error('WARNING: This version of serverless-webpack-plugin needs Serverless 1.0');
+        throw new this.serverless.classes.Error('This version of serverless-webpack-plugin requires Serverless 1.0');
       }
       var servicePath = this.serverless.config.servicePath;
       var serverlessTmpDirPath = _path2.default.join(servicePath, '.serverless');
@@ -94,7 +112,7 @@ module.exports = function () {
         return './' + h + '.js';
       }, handlerNames);
 
-      var webpackConfig = require(_path2.default.resolve(servicePath, './webpack.config.js'));
+      var webpackConfig = getConfig(servicePath);
       webpackConfig.context = servicePath;
       webpackConfig.entry = (0, _fp.compact)((0, _fp.concat)(webpackConfig.entry, entrypoints));
       webpackConfig.output = {
@@ -123,6 +141,5 @@ module.exports = function () {
       });
     }
   }]);
-
   return ServerlessWebpack;
 }();

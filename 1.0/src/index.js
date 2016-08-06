@@ -37,7 +37,7 @@ const artifact = 'handler.js';
 const getConfig = servicePath =>
   require(path.resolve(servicePath, './webpack.config.js')); // eslint-disable-line global-require
 
-module.exports = class ServerlessWebpack {
+export default class ServerlessWebpack {
   constructor(serverless) {
     this.serverless = serverless;
     this.hooks = {
@@ -48,7 +48,7 @@ module.exports = class ServerlessWebpack {
   optimize() {
     if (!this.serverless.getVersion().startsWith('1.0')) {
       throw new this.serverless.classes.Error(
-        'WARNING: This version of serverless-webpack-plugin needs Serverless 1.0'
+        'This version of serverless-webpack-plugin requires Serverless 1.0'
       );
     }
     const servicePath = this.serverless.config.servicePath;
@@ -86,4 +86,4 @@ module.exports = class ServerlessWebpack {
       this.serverless.service.package.artifact = artifactFilePath;
     });
   }
-};
+}
