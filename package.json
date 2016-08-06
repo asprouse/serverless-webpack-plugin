@@ -27,6 +27,11 @@
     "serverless.com"
   ],
   "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "1.0/index.js"
+  ],
   "bin": {},
   "scripts": {
     "build": "babel -d 1.0 1.0/src/",
