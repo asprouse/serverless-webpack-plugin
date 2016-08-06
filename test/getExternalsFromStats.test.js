@@ -4,7 +4,9 @@ const assert = require('chai').assert;
 function getStatsMock() {
   return {
     toJson() {
-      return { modules: require('./data/stats.json').slice(0) };
+      return {
+        modules: require('./data/stats.json').slice(0) // eslint-disable-line global-require
+      };
     }
   };
 }
