@@ -1,9 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -88,7 +84,62 @@ var getConfig = function getConfig(servicePath) {
   return require(_path2.default.resolve(servicePath, './webpack.config.js'));
 }; // eslint-disable-line global-require
 
-var ServerlessWebpack = function () {
+var zip = function () {
+  var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(zipper, readFile, tmpDir) {
+    return _regenerator2.default.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.next = 2;
+            return _promise2.default.all((0, _fp.map)(function () {
+              var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(file) {
+                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                  while (1) {
+                    switch (_context2.prev = _context2.next) {
+                      case 0:
+                        _context2.t0 = zipper;
+                        _context2.t1 = file;
+                        _context2.next = 4;
+                        return readFile(_path2.default.resolve(tmpDir, file));
+
+                      case 4:
+                        _context2.t2 = _context2.sent;
+                        return _context2.abrupt('return', _context2.t0.file.call(_context2.t0, _context2.t1, _context2.t2));
+
+                      case 6:
+                      case 'end':
+                        return _context2.stop();
+                    }
+                  }
+                }, _callee2, undefined);
+              }));
+
+              return function (_x5) {
+                return _ref3.apply(this, arguments);
+              };
+            }(), [artifact, artifact + '.map']));
+
+          case 2:
+            return _context3.abrupt('return', zipper.generate({
+              type: 'nodebuffer',
+              compression: 'DEFLATE',
+              platform: process.platform
+            }));
+
+          case 3:
+          case 'end':
+            return _context3.stop();
+        }
+      }
+    }, _callee3, undefined);
+  }));
+
+  return function zip(_x2, _x3, _x4) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+module.exports = function () {
   function ServerlessWebpack(serverless) {
     (0, _classCallCheck3.default)(this, ServerlessWebpack);
 
@@ -101,14 +152,14 @@ var ServerlessWebpack = function () {
   (0, _createClass3.default)(ServerlessWebpack, [{
     key: 'optimize',
     value: function () {
-      var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
-        var servicePath, serverlessTmpDirPath, handlerNames, entrypoints, webpackConfig, stats, zip, data, zipFileName, artifactFilePath;
-        return _regenerator2.default.wrap(function _callee2$(_context2) {
+      var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
+        var servicePath, serverlessTmpDirPath, handlerNames, entrypoints, webpackConfig, stats, data, zipFileName, artifactFilePath;
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (this.serverless.getVersion().startsWith('1.0')) {
-                  _context2.next = 2;
+                  _context4.next = 2;
                   break;
                 }
 
@@ -133,24 +184,19 @@ var ServerlessWebpack = function () {
                   filename: artifact
                 };
 
-                _context2.next = 12;
+                _context4.next = 12;
                 return runWebpack(webpackConfig);
 
               case 12:
-                stats = _context2.sent;
+                stats = _context4.sent;
 
                 this.serverless.cli.log(format(stats));
 
-                zip = new _nodeZip2.default();
+                _context4.next = 16;
+                return zip(new _nodeZip2.default(), _fs2.default.readFile, serverlessTmpDirPath);
 
-                (0, _fp.forEach)(function (f) {
-                  return zip.file(f, _fs2.default.readFileSync(_path2.default.resolve(serverlessTmpDirPath, f)));
-                }, [artifact, artifact + '.map']);
-                data = zip.generate({
-                  type: 'nodebuffer',
-                  compression: 'DEFLATE',
-                  platform: process.platform
-                });
+              case 16:
+                data = _context4.sent;
                 zipFileName = this.serverless.service.service + '-' + new Date().getTime().toString() + '.zip';
                 artifactFilePath = _path2.default.resolve(serverlessTmpDirPath, zipFileName);
 
@@ -160,14 +206,14 @@ var ServerlessWebpack = function () {
 
               case 21:
               case 'end':
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee4, this);
       }));
 
       function optimize() {
-        return _ref2.apply(this, arguments);
+        return _ref4.apply(this, arguments);
       }
 
       return optimize;
@@ -175,5 +221,3 @@ var ServerlessWebpack = function () {
   }]);
   return ServerlessWebpack;
 }();
-
-exports.default = ServerlessWebpack;

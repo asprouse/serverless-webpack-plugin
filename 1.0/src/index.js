@@ -6,7 +6,6 @@ import Zip from 'node-zip';
 import {
   compact,
   concat,
-  forEach,
   map,
   uniq,
 } from 'lodash/fp';
@@ -37,7 +36,18 @@ const artifact = 'handler.js';
 const getConfig = servicePath =>
   require(path.resolve(servicePath, './webpack.config.js')); // eslint-disable-line global-require
 
-export default class ServerlessWebpack {
+const zip = async (zipper, readFile, tmpDir) => {
+  await Promise.all(map(async file =>
+    zipper.file(file, await readFile(path.resolve(tmpDir, file))
+  ), [artifact, `${artifact}.map`]));
+  return zipper.generate({
+    type: 'nodebuffer',
+    compression: 'DEFLATE',
+    platform: process.platform,
+  });
+};
+
+module.exports = class ServerlessWebpack {
   constructor(serverless) {
     this.serverless = serverless;
     this.hooks = {
@@ -45,7 +55,7 @@ export default class ServerlessWebpack {
     };
   }
 
-  optimize() {
+  async optimize() {
     if (!this.serverless.getVersion().startsWith('1.0')) {
       throw new this.serverless.classes.Error(
         'This version of serverless-webpack-plugin requires Serverless 1.0'
@@ -54,7 +64,8 @@ export default class ServerlessWebpack {
     const servicePath = this.serverless.config.servicePath;
     const serverlessTmpDirPath = path.join(servicePath, '.serverless');
 
-    const handlerNames = uniq(map(f => f.handler.split('.')[0], this.serverless.service.functions));
+    const handlerNames = uniq(map(f =>
+      f.handler.split('.')[0], this.serverless.service.functions));
     const entrypoints = map(h => `./${h}.js`, handlerNames);
 
     const webpackConfig = getConfig(servicePath);
@@ -66,24 +77,16 @@ export default class ServerlessWebpack {
       filename: artifact,
     };
 
-    return runWebpack(webpackConfig)
-    .then(stats => this.serverless.cli.log(format(stats)))
-    .then(() => {
-      const zip = new Zip();
-      forEach(f =>
-        zip.file(f, fs.readFileSync(path.resolve(serverlessTmpDirPath, f))
-      ), [artifact, `${artifact}.map`]);
-      const data = zip.generate({
-        type: 'nodebuffer',
-        compression: 'DEFLATE',
-        platform: process.platform,
-      });
-      const zipFileName =
-        `${this.serverless.service.service}-${(new Date).getTime().toString()}.zip`;
-      const artifactFilePath = path.resolve(serverlessTmpDirPath, zipFileName);
+    const stats = await runWebpack(webpackConfig);
+    this.serverless.cli.log(format(stats));
 
-      this.serverless.utils.writeFileSync(artifactFilePath, data);
-      this.serverless.service.package.artifact = artifactFilePath;
-    });
+    const data = await zip(new Zip(), fs.readFile, serverlessTmpDirPath);
+
+    const zipFileName =
+      `${this.serverless.service.service}-${(new Date).getTime().toString()}.zip`;
+    const artifactFilePath = path.resolve(serverlessTmpDirPath, zipFileName);
+
+    this.serverless.utils.writeFileSync(artifactFilePath, data);
+    this.serverless.service.package.artifact = artifactFilePath;
   }
-}
+};
