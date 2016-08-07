@@ -6,6 +6,7 @@ import Zip from 'node-zip';
 import {
   compact,
   concat,
+  forEach,
   map,
   uniq,
 } from 'lodash/fp';
@@ -36,10 +37,10 @@ const artifact = 'handler.js';
 const getConfig = servicePath =>
   require(path.resolve(servicePath, './webpack.config.js')); // eslint-disable-line global-require
 
-const zip = async (zipper, readFile, tmpDir) => {
-  await Promise.all(map(async file =>
-    zipper.file(file, await readFile(path.resolve(tmpDir, file))
-  ), [artifact, `${artifact}.map`]));
+const zip = (zipper, readFile, tmpDir) => {
+  forEach(file =>
+    zipper.file(file, readFile(path.resolve(tmpDir, file))
+  ), [artifact, `${artifact}.map`]);
   return zipper.generate({
     type: 'nodebuffer',
     compression: 'DEFLATE',
@@ -80,7 +81,7 @@ module.exports = class ServerlessWebpack {
     const stats = await runWebpack(webpackConfig);
     this.serverless.cli.log(format(stats));
 
-    const data = await zip(new Zip(), fs.readFile, serverlessTmpDirPath);
+    const data = zip(new Zip(), fs.readFileSync, serverlessTmpDirPath);
 
     const zipFileName =
       `${this.serverless.service.service}-${(new Date).getTime().toString()}.zip`;
