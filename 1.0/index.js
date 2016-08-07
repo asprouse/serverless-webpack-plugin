@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -84,7 +88,7 @@ var getConfig = function getConfig(servicePath) {
   return require(_path2.default.resolve(servicePath, './webpack.config.js'));
 }; // eslint-disable-line global-require
 
-module.exports = function () {
+var ServerlessWebpack = function () {
   function ServerlessWebpack(serverless) {
     (0, _classCallCheck3.default)(this, ServerlessWebpack);
 
@@ -96,50 +100,80 @@ module.exports = function () {
 
   (0, _createClass3.default)(ServerlessWebpack, [{
     key: 'optimize',
-    value: function optimize() {
-      var _this = this;
+    value: function () {
+      var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+        var servicePath, serverlessTmpDirPath, handlerNames, entrypoints, webpackConfig, stats, zip, data, zipFileName, artifactFilePath;
+        return _regenerator2.default.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                if (this.serverless.getVersion().startsWith('1.0')) {
+                  _context2.next = 2;
+                  break;
+                }
 
-      if (!this.serverless.getVersion().startsWith('1.0')) {
-        throw new this.serverless.classes.Error('This version of serverless-webpack-plugin requires Serverless 1.0');
+                throw new this.serverless.classes.Error('This version of serverless-webpack-plugin requires Serverless 1.0');
+
+              case 2:
+                servicePath = this.serverless.config.servicePath;
+                serverlessTmpDirPath = _path2.default.join(servicePath, '.serverless');
+                handlerNames = (0, _fp.uniq)((0, _fp.map)(function (f) {
+                  return f.handler.split('.')[0];
+                }, this.serverless.service.functions));
+                entrypoints = (0, _fp.map)(function (h) {
+                  return './' + h + '.js';
+                }, handlerNames);
+                webpackConfig = getConfig(servicePath);
+
+                webpackConfig.context = servicePath;
+                webpackConfig.entry = (0, _fp.compact)((0, _fp.concat)(webpackConfig.entry, entrypoints));
+                webpackConfig.output = {
+                  libraryTarget: 'commonjs',
+                  path: serverlessTmpDirPath,
+                  filename: artifact
+                };
+
+                _context2.next = 12;
+                return runWebpack(webpackConfig);
+
+              case 12:
+                stats = _context2.sent;
+
+                this.serverless.cli.log(format(stats));
+
+                zip = new _nodeZip2.default();
+
+                (0, _fp.forEach)(function (f) {
+                  return zip.file(f, _fs2.default.readFileSync(_path2.default.resolve(serverlessTmpDirPath, f)));
+                }, [artifact, artifact + '.map']);
+                data = zip.generate({
+                  type: 'nodebuffer',
+                  compression: 'DEFLATE',
+                  platform: process.platform
+                });
+                zipFileName = this.serverless.service.service + '-' + new Date().getTime().toString() + '.zip';
+                artifactFilePath = _path2.default.resolve(serverlessTmpDirPath, zipFileName);
+
+
+                this.serverless.utils.writeFileSync(artifactFilePath, data);
+                this.serverless.service.package.artifact = artifactFilePath;
+
+              case 21:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function optimize() {
+        return _ref2.apply(this, arguments);
       }
-      var servicePath = this.serverless.config.servicePath;
-      var serverlessTmpDirPath = _path2.default.join(servicePath, '.serverless');
 
-      var handlerNames = (0, _fp.uniq)((0, _fp.map)(function (f) {
-        return f.handler.split('.')[0];
-      }, this.serverless.service.functions));
-      var entrypoints = (0, _fp.map)(function (h) {
-        return './' + h + '.js';
-      }, handlerNames);
-
-      var webpackConfig = getConfig(servicePath);
-      webpackConfig.context = servicePath;
-      webpackConfig.entry = (0, _fp.compact)((0, _fp.concat)(webpackConfig.entry, entrypoints));
-      webpackConfig.output = {
-        libraryTarget: 'commonjs',
-        path: serverlessTmpDirPath,
-        filename: artifact
-      };
-
-      return runWebpack(webpackConfig).then(function (stats) {
-        return _this.serverless.cli.log(format(stats));
-      }).then(function () {
-        var zip = new _nodeZip2.default();
-        (0, _fp.forEach)(function (f) {
-          return zip.file(f, _fs2.default.readFileSync(_path2.default.resolve(serverlessTmpDirPath, f)));
-        }, [artifact, artifact + '.map']);
-        var data = zip.generate({
-          type: 'nodebuffer',
-          compression: 'DEFLATE',
-          platform: process.platform
-        });
-        var zipFileName = _this.serverless.service.service + '-' + new Date().getTime().toString() + '.zip';
-        var artifactFilePath = _path2.default.resolve(serverlessTmpDirPath, zipFileName);
-
-        _this.serverless.utils.writeFileSync(artifactFilePath, data);
-        _this.serverless.service.package.artifact = artifactFilePath;
-      });
-    }
+      return optimize;
+    }()
   }]);
   return ServerlessWebpack;
 }();
+
+exports.default = ServerlessWebpack;

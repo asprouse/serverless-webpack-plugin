@@ -34,6 +34,7 @@
   ],
   "bin": {},
   "scripts": {
+    "add-artifacts": "git add 1.0/index.js",
     "build": "babel -d 1.0 1.0/src/",
     "lint": "eslint --quiet --cache .",
     "prepublish": "npm run build",
@@ -44,7 +45,9 @@
   },
   "pre-commit": [
     "lint",
-    "test"
+    "test",
+    "build",
+    "add-artifacts"
   ],
   "devDependencies": {
     "babel-cli": "^6.11.4",
