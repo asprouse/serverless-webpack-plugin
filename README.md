@@ -25,7 +25,7 @@ plugins: [
 ]
 ```
 
-* In the `custom` property of either your `s-project.json` or `s-function.json` add an webpack property. The configPath is relative to the project root.
+* In the `custom` property of either your `s-project.json` or `s-function.json` add an webpack property. The configPath is relative to the webpack.config.js file.
 
 ```javascript
 {
@@ -40,9 +40,29 @@ plugins: [
 
 ```
 
+for example:
+```javascript
+{
+    ...
+    "custom": {
+        "webpack": {
+            "configPath": "/webpack.config.js"
+        }
+    }
+    ...
+}
+
+```
+
 
 ## Webpack config
-This plugin allows you to completely customize how your code is optimized by specifying your own webpack config. Heres a sample `webpack.config.js`:
+This plugin allows you to completely customize how your code is optimized by specifying your own webpack config. Make sure to have these dependencies.
+
+```
+npm install babel-preset-es2015 babel-preset-stage-0 json-loader babel-loader --save-dev
+```
+
+Heres a sample `webpack.config.js`:
 
 ```javascript
 var webpack = require('webpack');
@@ -74,8 +94,12 @@ module.exports = {
   module: {
     loaders: [
       {
+        test: /\.json$/,
+        loader: 'json-loader'
+      },
+      {
         test: /\.jsx?$/,
-        loader: 'babel',
+        loader: 'babel-loader',
         exclude: /node_modules/,
         query: {
           presets: ['es2015', 'stage-0']
