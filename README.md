@@ -25,7 +25,7 @@ plugins: [
 ]
 ```
 
-* In the `custom` property of either your `s-project.json` or `s-function.json` add an webpack property. The configPath is relative to the project root.
+* In the `custom` property of either your `s-project.json` or `s-function.json` add an webpack property. The configPath is relative to the webpack.config.js file.
 
 ```javascript
 {
@@ -33,6 +33,20 @@ plugins: [
     "custom": {
         "webpack": {
             "configPath": "path/relative/to/project-path"
+        }
+    }
+    ...
+}
+
+```
+
+for example:
+```javascript
+{
+    ...
+    "custom": {
+        "webpack": {
+            "configPath": "/webpack.config.js"
         }
     }
     ...
