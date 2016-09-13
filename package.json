@@ -1,16 +1,78 @@
 {
-  "name": "serverless-webpack-plugin",
-  "version": "0.4.5",
+  "_args": [
+    [
+      {
+        "name": "serverless-webpack-plugin",
+        "raw": "serverless-webpack-plugin",
+        "rawSpec": "",
+        "scope": null,
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/Users/annadoubkova/Workspace/sls1"
+    ]
+  ],
+  "_from": "serverless-webpack-plugin@latest",
+  "_id": "serverless-webpack-plugin@0.4.5",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/serverless-webpack-plugin",
+  "_nodeVersion": "4.1.2",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/serverless-webpack-plugin-0.4.5.tgz_1469203828656_0.6633494105190039"
+  },
+  "_npmUser": {
+    "email": "sprouse.a@gmail.com",
+    "name": "asprouse"
+  },
+  "_npmVersion": "2.14.6",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "serverless-webpack-plugin",
+    "raw": "serverless-webpack-plugin",
+    "rawSpec": "",
+    "scope": null,
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "https://registry.npmjs.org/serverless-webpack-plugin/-/serverless-webpack-plugin-0.4.5.tgz",
+  "_shasum": "344b83202b4dfa437d4b1b8ac8493c292f04311b",
+  "_shrinkwrap": null,
+  "_spec": "serverless-webpack-plugin",
+  "_where": "/Users/annadoubkova/Workspace/sls1",
+  "author": {
+    "name": "asprouse"
+  },
+  "bin": {},
+  "bugs": {
+    "url": "https://github.com/asprouse/serverless-webpack-plugin/issues"
+  },
+  "dependencies": {
+    "bluebird": "^3.1.1",
+    "clone": "^1.0.2",
+    "fs-extra": "^0.8.1"
+  },
+  "description": "Serverless Webpack Plugin - Significantly reduces Lambda file size and improves performance",
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^5.0.0",
+    "mocha": "^2.3.4"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "344b83202b4dfa437d4b1b8ac8493c292f04311b",
+    "tarball": "https://registry.npmjs.org/serverless-webpack-plugin/-/serverless-webpack-plugin-0.4.5.tgz"
+  },
   "engines": {
     "node": ">=4.0"
   },
-  "description": "Serverless Webpack Plugin - Significantly reduces Lambda file size and improves performance",
-  "author": "asprouse",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/asprouse/serverless-webpack-plugin"
-  },
+  "gitHead": "6ba6cfe79c885f53d4f19c332f7a1cbd5ce15960",
+  "homepage": "https://github.com/asprouse/serverless-webpack-plugin#readme",
   "keywords": [
     "serverless webpack plugin",
     "serverless webpack",
@@ -26,23 +88,26 @@
     "amazon web services",
     "serverless.com"
   ],
+  "license": "MIT",
   "main": "index.js",
-  "bin": {},
-  "scripts": {
-    "test": "NODE_PATH=. mocha \"test/**/*.test.js\""
-  },
+  "maintainers": [
+    {
+      "email": "sprouse.a@gmail.com",
+      "name": "asprouse"
+    }
+  ],
+  "name": "serverless-webpack-plugin",
+  "optionalDependencies": {},
   "peerDependencies": {
     "webpack": "^1.12.14"
   },
-  "devDependencies": {
-    "chai": "^3.4.1",
-    "mocha": "^2.3.4",
-    "eslint": "^1.10.3",
-    "eslint-config-airbnb": "^5.0.0"
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asprouse/serverless-webpack-plugin.git"
   },
-  "dependencies": {
-    "bluebird": "^3.1.1",
-    "clone": "^1.0.2",
-    "fs-extra": "^0.26.7"
-  }
+  "scripts": {
+    "test": "NODE_PATH=. mocha \"test/**/*.test.js\""
+  },
+  "version": "1.0.0"
 }
