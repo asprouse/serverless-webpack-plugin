@@ -101,7 +101,7 @@ module.exports = function () {
 
     this.serverless = serverless;
     this.hooks = {
-      'before:deploy:createDeploymentPackage': this.optimize.bind(this)
+      'before:deploy:createDeploymentArtifacts': this.optimize.bind(this)
     };
   }
 
