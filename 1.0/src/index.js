@@ -37,10 +37,10 @@ const artifact = 'handler.js';
 const getConfig = servicePath =>
   require(path.resolve(servicePath, './webpack.config.js')); // eslint-disable-line global-require
 
-const zip = (zipper, readFile, tmpDir) => {
+const zip = (zipper, readFile, dir) => {
   forEach(file =>
-    zipper.file(file, readFile(path.resolve(tmpDir, file))
-  ), [artifact, `${artifact}.map`]);
+    zipper.file(file, readFile(path.resolve(dir, file))
+  ), fs.readdirSync(dir));
   return zipper.generate({
     type: 'nodebuffer',
     compression: 'DEFLATE',
@@ -72,16 +72,18 @@ module.exports = class ServerlessWebpack {
     const webpackConfig = getConfig(servicePath);
     webpackConfig.context = servicePath;
     webpackConfig.entry = compact(concat(webpackConfig.entry, entrypoints));
+
+    const outputDir = path.join(serverlessTmpDirPath, 'output');
     webpackConfig.output = {
       libraryTarget: 'commonjs',
-      path: serverlessTmpDirPath,
+      path: outputDir,
       filename: artifact,
     };
 
     const stats = await runWebpack(webpackConfig);
     this.serverless.cli.log(format(stats));
 
-    const data = zip(new Zip(), fs.readFileSync, serverlessTmpDirPath);
+    const data = zip(new Zip(), fs.readFileSync, outputDir);
 
     const zipFileName =
       `${this.serverless.service.service}-${(new Date).getTime().toString()}.zip`;

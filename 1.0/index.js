@@ -84,10 +84,10 @@ var getConfig = function getConfig(servicePath) {
   return require(_path2.default.resolve(servicePath, './webpack.config.js'));
 }; // eslint-disable-line global-require
 
-var zip = function zip(zipper, readFile, tmpDir) {
+var zip = function zip(zipper, readFile, dir) {
   (0, _fp.forEach)(function (file) {
-    return zipper.file(file, readFile(_path2.default.resolve(tmpDir, file)));
-  }, [artifact, artifact + '.map']);
+    return zipper.file(file, readFile(_path2.default.resolve(dir, file)));
+  }, _fs2.default.readdirSync(dir));
   return zipper.generate({
     type: 'nodebuffer',
     compression: 'DEFLATE',
@@ -109,7 +109,7 @@ module.exports = function () {
     key: 'optimize',
     value: function () {
       var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
-        var servicePath, serverlessTmpDirPath, handlerNames, entrypoints, webpackConfig, stats, data, zipFileName, artifactFilePath;
+        var servicePath, serverlessTmpDirPath, handlerNames, entrypoints, webpackConfig, outputDir, stats, data, zipFileName, artifactFilePath;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -134,21 +134,24 @@ module.exports = function () {
 
                 webpackConfig.context = servicePath;
                 webpackConfig.entry = (0, _fp.compact)((0, _fp.concat)(webpackConfig.entry, entrypoints));
+
+                outputDir = _path2.default.join(serverlessTmpDirPath, 'output');
+
                 webpackConfig.output = {
                   libraryTarget: 'commonjs',
-                  path: serverlessTmpDirPath,
+                  path: outputDir,
                   filename: artifact
                 };
 
-                _context2.next = 12;
+                _context2.next = 13;
                 return runWebpack(webpackConfig);
 
-              case 12:
+              case 13:
                 stats = _context2.sent;
 
                 this.serverless.cli.log(format(stats));
 
-                data = zip(new _nodeZip2.default(), _fs2.default.readFileSync, serverlessTmpDirPath);
+                data = zip(new _nodeZip2.default(), _fs2.default.readFileSync, outputDir);
                 zipFileName = this.serverless.service.service + '-' + new Date().getTime().toString() + '.zip';
                 artifactFilePath = _path2.default.resolve(serverlessTmpDirPath, zipFileName);
 
@@ -156,7 +159,7 @@ module.exports = function () {
                 this.serverless.utils.writeFileSync(artifactFilePath, data);
                 this.serverless.service.package.artifact = artifactFilePath;
 
-              case 19:
+              case 20:
               case 'end':
                 return _context2.stop();
             }
