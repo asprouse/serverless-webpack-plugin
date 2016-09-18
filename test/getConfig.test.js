@@ -92,7 +92,7 @@ describe.only('getConfig', () => {
     };
     const func = {};
     const result = getConfig(projectPath, project, func);
-    const webpackConfig = require('./data/webpack.conf.js');
+    const webpackConfig = require('./data/webpack.conf.js'); // eslint-disable-line global-require
 
     assert.notStrictEqual(result.webpackConfig, webpackConfig);
     assert.deepEqual(result, {

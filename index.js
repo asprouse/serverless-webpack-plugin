@@ -1,4 +1,3 @@
-'use strict';
 const path = require('path');
 const webpack = require('webpack');
 const Promise = require('bluebird');
@@ -15,13 +14,13 @@ function runWebpack(config) {
       if (err) {
         return reject(err);
       }
-      resolve(stats);
+      return resolve(stats);
     });
   });
 }
 
 module.exports = function getPlugin(S) {
-  const SCli = require(S.getServerlessPath('utils/cli'));
+  const SCli = require(S.getServerlessPath('utils/cli')); // eslint-disable-line global-require
 
   function logStats(stats) {
     SCli.log(stats.toString({
@@ -50,7 +49,7 @@ module.exports = function getPlugin(S) {
 
     optimize(evt) {
       // Validate: Check Serverless version
-      if (parseInt(S._version.split('.')[1], 10) < 5) {
+      if (parseInt(S._version.split('.')[1], 10) < 5) { // eslint-disable-line no-underscore-dangle
         SCli.log('WARNING: This version of the Serverless Optimizer Plugin ' +
           'will not work with a version of Serverless that is less than v0.5');
       }

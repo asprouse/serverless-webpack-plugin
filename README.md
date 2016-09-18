@@ -1,25 +1,37 @@
 Serverless Webpack Plugin
 =============================
 
-Forked from [serverless-optimizer-plugin](https://github.com/serverless/serverless-optimizer-plugin) this plugin uses 
+Forked from [serverless-optimizer-plugin](https://github.com/serverless/serverless-optimizer-plugin) this plugin uses
 webpack to optimize your Serverless Node.js Functions on deployment.
 
-Reducing the file size of your AWS Lambda Functions allows AWS to provision them more quickly, speeding up the response 
+Reducing the file size of your AWS Lambda Functions allows AWS to provision them more quickly, speeding up the response
 time of your Lambdas.  Smaller Lambda sizes also helps you develop faster because you can upload them faster.  
 This Severless Plugin is absolutely recommended for every project including Lambdas with Node.js.
 
-**Note:** Requires Serverless *v0.5.0*.
+**Note:** Requires Serverless *v0.5.0* or Serverless *v1.0*
 
 ### Setup
 
 * Install the plugin and webpack in the root of your Serverless Project:
-```
+
+```sh
 npm install serverless-webpack-plugin webpack --save-dev
 ```
 
+#### Using with Serverless 1.0...
+
+* Add the plugin to the `plugins` array in `serverless.yml`:
+
+```yaml
+plugins:
+  - serverless-webpack-plugin/1.0
+```
+
+#### Using with Serverless 0.5...
+
 * Add the plugin to the `plugins` array in your Serverless Project's `s-project.json`, like this:
 
-```
+```json
 plugins: [
     "serverless-webpack-plugin"
 ]
@@ -85,13 +97,13 @@ module.exports = {
   }
 };
 ```
-**Note:** Some node modules don't play nicely with `webpack.optimize.UglifyJsPlugin` in this case, you can omit it from 
+**Note:** Some node modules don't play nicely with `webpack.optimize.UglifyJsPlugin` in this case, you can omit it from
 your config, or add the offending modules to `externals`. For more on externals see below.  
 
 ### Externals
-Externals specified in your webpack config will be properly packaged into the deployment. 
-This is useful when working with modules that have binary dependencies, are incompatible with `webpack.optimize.UglifyJsPlugin` 
-or if you simply want to improve build performance. Check out [webpack-node-externals](https://github.com/liady/webpack-node-externals) 
+Externals specified in your webpack config will be properly packaged into the deployment.
+This is useful when working with modules that have binary dependencies, are incompatible with `webpack.optimize.UglifyJsPlugin`
+or if you simply want to improve build performance. Check out [webpack-node-externals](https://github.com/liady/webpack-node-externals)
 for an easy way to externalize all node modules.
 
 ### Source Maps
@@ -103,8 +115,8 @@ you can specify those modules with entry option in your webpack config.
 For example if you need to load the babel-polyfill, you can do that
 by adding `entry: ['babel-polyfill']` to your webpack config.
 This will first load the babel-polyfill module and then your lambda function module.
- 
+
 ### Improving deploy performance
-  
-The plugin builds directly from the source files, using "magic handlers" to include the parent directory (as mentioned in 
-the [0.5.0 release notes](https://github.com/serverless/serverless/releases/tag/v0.5.0)) is unnecessary. 
+
+The plugin builds directly from the source files, using "magic handlers" to include the parent directory (as mentioned in
+the [0.5.0 release notes](https://github.com/serverless/serverless/releases/tag/v0.5.0)) is unnecessary.

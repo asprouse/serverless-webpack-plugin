@@ -1,0 +1,9 @@
+---
+parser: babel-eslint
+extends: airbnb
+env:
+  es6: true
+rules:
+  strict: 0
+  object-shorthand: 0
+  react/require-extension: 0
